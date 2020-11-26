@@ -9,8 +9,8 @@ import (
 
 // AccountManager is the main application for running the account manager
 type AccountManager struct {
-	Usage string
-	// Description string
+	Usage              string
+	transactionService transaction.Service
 }
 
 //NewCommand creates a new Account manager executable for the cli
@@ -20,13 +20,15 @@ func NewCommand() *AccountManager {
 		Each formatted like so: {"id":"15887","customer_id":"528","load_amount":"$3318.47", "time":"2000-01-01T00:00:00Z"}
 		
 		Input:
-		- inputFile: file to be processed`}
+		- inputFile: file to be processed`,
+		transactionService: transaction.Service{},
+	}
 
 	return accountManager
 }
 
 //Execute runs the account manger application
-func (*AccountManager) Execute() {
+func (am *AccountManager) Execute() {
 	inputFilePtr := flag.String("input", "", "Input file to process (Required)")
 	flag.Parse()
 
@@ -35,5 +37,5 @@ func (*AccountManager) Execute() {
 		os.Exit(1)
 	}
 
-	transaction.ProcessTransactionFile(inputFilePtr)
+	am.transactionService.ProcessTransactionFile(inputFilePtr)
 }
