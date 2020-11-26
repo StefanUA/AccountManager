@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"time"
 )
 
 type (
 	//IService interface establishes the contract for handling
 	//transactions
 	IService interface {
-		ReadTransactionFile(string) error
+		ReadTransactionFile(string) ([]*Transaction, error)
+		ProcessTransactions([]*Transaction) ([]*Response, error)
+		WriteTransactionOutput([]*Response, string) error
 	}
 
 	//Service implements the contract for handling
@@ -21,10 +22,17 @@ type (
 
 	//Transaction represents the structure of a requested transaction
 	Transaction struct {
-		ID         int       `json:"id"`
-		CustomerID int       `json:"customer_id"`
-		LoadAmount string    `json:"load_amount"`
-		Time       time.Time `json:"time"`
+		ID         int      `json:"id"`
+		CustomerID int      `json:"customer_id"`
+		LoadAmount string   `json:"load_amount"`
+		Time       JSONTime `json:"time"`
+	}
+
+	//Response represents the result of an executed transaction
+	Response struct {
+		ID         int  `json:"id"`
+		CustomerID int  `json:"customer_id"`
+		Acceoted   bool `json:"accepted"`
 	}
 )
 
@@ -32,8 +40,8 @@ var transactionService IService
 
 //ReadTransactionFile receives an input file location
 //and executes transactions written in the file
-func (*Service) ReadTransactionFile(inputFile *string) ([]*Transaction, error) {
-	file, err := os.Open(*inputFile)
+func (Service) ReadTransactionFile(inputFile string) ([]*Transaction, error) {
+	file, err := os.Open(inputFile)
 	if err != nil {
 		log.Fatalf("Error reading file: %v", err)
 		return nil, err
@@ -52,4 +60,17 @@ func (*Service) ReadTransactionFile(inputFile *string) ([]*Transaction, error) {
 	}
 
 	return transactions, nil
+}
+
+//ProcessTransactions receives a list of transactions
+//and executes transactions written in the file
+func (Service) ProcessTransactions(transactions []*Transaction) ([]*Response, error) {
+
+	return nil, nil
+}
+
+//WriteTransactionOutput receives a list of transaction responses
+//and outputs the data into an output file
+func (Service) WriteTransactionOutput(responses []*Response, outputFile string) error {
+	return nil
 }
