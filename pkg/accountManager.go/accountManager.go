@@ -1,6 +1,11 @@
 package accountmanager
 
-import "flag"
+import (
+	"flag"
+	"os"
+
+	"github.com/StefanUA/AccountManager/internal/transaction"
+)
 
 // AccountManager is the main application for running the account manager
 type AccountManager struct {
@@ -20,6 +25,15 @@ func NewCommand() *AccountManager {
 	return accountManager
 }
 
-(*AccountManager) func execute() {
+//Execute runs the account manger application
+func (*AccountManager) Execute() {
 	inputFilePtr := flag.String("input", "", "Input file to process (Required)")
+	flag.Parse()
+
+	if *inputFilePtr == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	transaction.ProcessTransactionFile(inputFilePtr)
 }

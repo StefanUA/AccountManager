@@ -1,10 +1,8 @@
 package main
 
-import "os"
+import accountmanager "github.com/StefanUA/AccountManager/pkg/accountManager.go"
 
 func main() {
-	string inputFile = os.Args[0]
-	accountmanager.NewCommand()
-	ProcessTransactionFile(inputFile)
-	
+	accountManager := accountmanager.NewCommand()
+	accountManager.Execute()
 }
