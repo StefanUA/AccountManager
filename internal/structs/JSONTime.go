@@ -1,33 +1,27 @@
 package structs
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
 // JSONTime encapsulates go's native time type to allow custom
 // manipulation specifically JSON marshalling
 type JSONTime struct {
-	time time.Time
+	Time time.Time
 }
 
 const layout = "2006-01-02T15:04:05Z07:00"
 
-// MarshalJSON implements
+// MarshalJSON conversts JSONTime to bytes representing a JSON string
 func (jt JSONTime) MarshalJSON() ([]byte, error) {
-	//do your serializing here
-	stamp := fmt.Sprintf("\"%s\"", jt.Format("Mon Jan _2"))
-	return []byte(stamp), nil
+	return []byte(jt.Time.Format(layout)), nil
 }
 
-// UnmarshalJSON implements
-func (jt JSONTime) UnmarshalJSON(b []byte) (err error) {
-	s := strings.Trim(string(b), "\"")
-	if s == "null" {
-		jt.time = time.Time{}
-		return
+// UnmarshalJSON conversts a JSON string to JSONTime stuct
+func (jt *JSONTime) UnmarshalJSON(b []byte) (err error) {
+	if b[0] == '"' && b[len(b)-1] == '"' {
+		b = b[1 : len(b)-1]
 	}
-	jt.Time, err = time.Parse(layout, s)
+	jt.Time, err = time.Parse(layout, string(b))
 	return
 }

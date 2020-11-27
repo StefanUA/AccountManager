@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+
+	"github.com/StefanUA/AccountManager/internal/structs"
 )
 
 type (
@@ -22,17 +24,17 @@ type (
 
 	//Transaction represents the structure of a requested transaction
 	Transaction struct {
-		ID         int      `json:"id"`
-		CustomerID int      `json:"customer_id"`
-		LoadAmount string   `json:"load_amount"`
-		Time       JSONTime `json:"time"`
+		ID         string           `json:"id"`
+		CustomerID string           `json:"customer_id"`
+		LoadAmount string           `json:"load_amount"`
+		Time       structs.JSONTime `json:"time"`
 	}
 
 	//Response represents the result of an executed transaction
 	Response struct {
 		ID         int  `json:"id"`
 		CustomerID int  `json:"customer_id"`
-		Acceoted   bool `json:"accepted"`
+		Accepted   bool `json:"accepted"`
 	}
 )
 
@@ -55,8 +57,9 @@ func (Service) ReadTransactionFile(inputFile string) ([]*Transaction, error) {
 		line := fileScanner.Text()
 		transaction := &Transaction{}
 
-		json.Unmarshal([]byte(line), transaction)
+		err = json.Unmarshal([]byte(line), transaction)
 		transactions = append(transactions, transaction)
+		log.Printf("%v\n", transaction.Time)
 	}
 
 	return transactions, nil
