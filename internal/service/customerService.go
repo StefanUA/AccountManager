@@ -48,13 +48,6 @@ func (cs CustomerService) isValidTransactionRequest(customer model.Customer, tra
 
 func (cs CustomerService) getWeekKey(inputTime time.Time) string {
 	year, week := inputTime.ISOWeek()
-	if inputTime.Month() == time.December && inputTime.Day() >= 29 || inputTime.Day() <= 31 {
-		week = 53
-		year = inputTime.Year()
-	} else if inputTime.Month() == time.January && inputTime.Day() >= 1 || inputTime.Day() <= 3 {
-		week = 1
-		year = inputTime.Year()
-	}
 	return strconv.Itoa(year) + "-" + strconv.Itoa(week)
 }
 
