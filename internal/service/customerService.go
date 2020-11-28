@@ -28,19 +28,17 @@ func (cs CustomerService) isValidTransactionRequest(customer model.Customer, tra
 	result := true
 
 	weekKey := cs.getWeekKey(transactionRequest.Time.Time)
-	weeklyTransaction, weekExists := customer.WeeklyTransactions[weekKey]
+	weeklyTransaction, _ := customer.WeeklyTransactions[weekKey]
 	amount, isValidAmount := cs.getAmount(transactionRequest.LoadAmount)
 
 	if !isValidAmount {
 		result = false
-	} else if weekExists {
-		if (weeklyTransaction.Total + amount) > model.MaxWeeklyLimit {
-			result = false
-		} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]; dayTransaction.Total+amount > model.MaxDailyLimit {
-			result = false
-		} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]; dayTransaction.Count+1 > model.MaxDailyTransationCount {
-			result = false
-		}
+	} else if (weeklyTransaction.Total + amount) > model.MaxWeeklyLimit {
+		result = false
+	} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]; dayTransaction.Total+amount > model.MaxDailyLimit {
+		result = false
+	} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]; dayTransaction.Count+1 > model.MaxDailyTransationCount {
+		result = false
 	}
 
 	return result
