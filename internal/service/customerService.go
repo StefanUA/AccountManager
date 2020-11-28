@@ -77,13 +77,14 @@ func (cs CustomerService) Load(transactionRequest model.TransactionRequest) bool
 		weeklyTransaction, weekExists := customer.WeeklyTransactions[weekKey]
 		if !weekExists {
 			weeklyTransaction = model.NewWeeklyTransaction()
-			customer.WeeklyTransactions[weekKey] = model.NewWeeklyTransaction()
+			customer.WeeklyTransactions[weekKey] = weeklyTransaction
 		}
 		amount, _ := cs.getAmount(transactionRequest.LoadAmount)
 		weeklyTransaction.Total += amount
-		dailyTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]
+		dailyTransaction := &weeklyTransaction.Days[transactionRequest.Time.Time.Day()]
 		dailyTransaction.Count++
 		dailyTransaction.Total += amount
+		customer.WeeklyTransactions[weekKey] = model.NewWeeklyTransaction()
 		result = true
 	}
 
