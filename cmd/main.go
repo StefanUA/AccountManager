@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/StefanUA/AccountManager/internal/transaction"
+	"github.com/StefanUA/AccountManager/internal/service"
 	accountmanager "github.com/StefanUA/AccountManager/pkg/accountManager"
 )
 
@@ -20,7 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	accountManager := accountmanager.NewCommand(transaction.Service{})
+	accountManager := accountmanager.NewCommand(service.TransactionService{})
 	err := accountManager.Execute(*inputFilePtr, *outputFilePtr)
 	if err != nil {
 		log.Fatalf("Error processing: %v", err)
