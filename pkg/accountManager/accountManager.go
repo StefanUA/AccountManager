@@ -9,7 +9,7 @@ type AccountManager struct {
 }
 
 //NewCommand creates a new Account manager executable for the cli
-func NewCommand(transactionService service.TransactionService) AccountManager {
+func NewCommand(transactionService service.ITransactionService) AccountManager {
 	accountManager := AccountManager{
 		Usage: `Account manager takes an input file of transactions and executes each transaction against banking rules. The output is the result of each inputed transaction. 
 		Each formatted like so: {"id":"15887","customer_id":"528","load_amount":"$3318.47", "time":"2000-01-01T00:00:00Z"}
