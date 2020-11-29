@@ -43,18 +43,18 @@ func NewOrderedResponseMap() OrderedResponseMap {
 }
 
 //Set adds a key-value pair
-func (orm OrderedResponseMap) Set(key string, value TransactionResponse) {
+func (orm *OrderedResponseMap) Set(key string, value TransactionResponse) {
 	orm.keys = append(orm.keys, key)
 	orm.data[key] = value
 }
 
 //Get returns a value when the key is passed in
-func (orm OrderedResponseMap) Get(key string) TransactionResponse {
+func (orm *OrderedResponseMap) Get(key string) TransactionResponse {
 	return orm.data[key]
 }
 
 //GetByIndex returns a value when the index is passed in
-func (orm OrderedResponseMap) GetByIndex(index int) TransactionResponse {
+func (orm *OrderedResponseMap) GetByIndex(index int) TransactionResponse {
 	if index < len(orm.keys) {
 		key := orm.keys[index]
 		return orm.data[key]
@@ -63,6 +63,6 @@ func (orm OrderedResponseMap) GetByIndex(index int) TransactionResponse {
 }
 
 //Size returns the number of items stored
-func (orm OrderedResponseMap) Size() int {
+func (orm *OrderedResponseMap) Size() int {
 	return len(orm.keys)
 }

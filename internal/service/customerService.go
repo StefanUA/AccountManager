@@ -24,7 +24,7 @@ type (
 
 var customers = make(map[string]model.Customer)
 
-func (cs CustomerService) isValidTransactionRequest(customer model.Customer, transactionRequest model.TransactionRequest) bool {
+func (cs *CustomerService) isValidTransactionRequest(customer model.Customer, transactionRequest model.TransactionRequest) bool {
 	result := true
 
 	weekKey := cs.getWeekKey(transactionRequest.Time.Time)
@@ -35,21 +35,21 @@ func (cs CustomerService) isValidTransactionRequest(customer model.Customer, tra
 		result = false
 	} else if (weeklyTransaction.Total + amount) > model.MaxWeeklyLimit {
 		result = false
-	} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]; dayTransaction.Total+amount > model.MaxDailyLimit {
+	} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Weekday()]; dayTransaction.Total+amount > model.MaxDailyLimit {
 		result = false
-	} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Day()]; dayTransaction.Count+1 > model.MaxDailyTransationCount {
+	} else if dayTransaction := weeklyTransaction.Days[transactionRequest.Time.Time.Weekday()]; dayTransaction.Count+1 > model.MaxDailyTransationCount {
 		result = false
 	}
 
 	return result
 }
 
-func (cs CustomerService) getWeekKey(inputTime time.Time) string {
+func (cs *CustomerService) getWeekKey(inputTime time.Time) string {
 	year, week := inputTime.ISOWeek()
 	return strconv.Itoa(year) + "-" + strconv.Itoa(week)
 }
 
-func (cs CustomerService) getAmount(cashAmount string) (float64, bool) {
+func (cs *CustomerService) getAmount(cashAmount string) (float64, bool) {
 	regx := regexp.MustCompile(`^\$([1-9]\d*\.\d\d?$)`)
 	match := regx.FindStringSubmatch(cashAmount)
 	if cap(match) == 1 {
@@ -64,7 +64,7 @@ func (cs CustomerService) getAmount(cashAmount string) (float64, bool) {
 
 //Load takes in a transaction and performs it against a customer account
 //returns a boolean to represent the successful execution of the transaction
-func (cs CustomerService) Load(transactionRequest model.TransactionRequest) bool {
+func (cs *CustomerService) Load(transactionRequest model.TransactionRequest) bool {
 	customer, custExists := customers[transactionRequest.CustomerID]
 	result := false
 
@@ -81,7 +81,7 @@ func (cs CustomerService) Load(transactionRequest model.TransactionRequest) bool
 		}
 		amount, _ := cs.getAmount(transactionRequest.LoadAmount)
 		weeklyTransaction.Total += amount
-		dailyTransaction := &weeklyTransaction.Days[transactionRequest.Time.Time.Day()]
+		dailyTransaction := &weeklyTransaction.Days[transactionRequest.Time.Time.Weekday()]
 		dailyTransaction.Count++
 		dailyTransaction.Total += amount
 		customer.WeeklyTransactions[weekKey] = weeklyTransaction

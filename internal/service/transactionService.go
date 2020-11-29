@@ -24,7 +24,7 @@ type (
 	TransactionService struct{}
 )
 
-var customerService ICustomerService = CustomerService{}
+var customerService ICustomerService = &CustomerService{}
 var osOpen = os.Open
 var osCreate = os.Create
 var bufioNewScanner = bufio.NewScanner
@@ -61,12 +61,10 @@ func (ts TransactionService) ProcessTransactions(transactionRequests []model.Tra
 	transactionResponses := model.NewOrderedResponseMap()
 	for _, transactionRequest := range transactionRequests {
 		transactionResponse := model.NewTransactionResponse(transactionRequest.ID, transactionRequest.CustomerID)
-		if existingTransaction := transactionResponses.Get(transactionResponse.ID); existingTransaction.ID == "" {
+		if existingTransaction := transactionResponses.Get(transactionResponse.ID + "-" + transactionResponse.CustomerID); existingTransaction.ID == "" {
 			transactionResponse.Accepted = customerService.Load(transactionRequest)
-		} else {
-			transactionResponse.Accepted = false
+			transactionResponses.Set(transactionResponse.ID+"-"+transactionResponse.CustomerID, transactionResponse)
 		}
-		transactionResponses.Set(transactionResponse.ID, transactionResponse)
 	}
 
 	return transactionResponses

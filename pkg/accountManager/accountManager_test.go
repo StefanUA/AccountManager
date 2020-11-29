@@ -26,10 +26,10 @@ func TestExecute(t *testing.T) {
 	readTransactionFileMock = func(s string) ([]model.TransactionRequest, error) {
 		return []model.TransactionRequest{}, nil
 	}
-	processTransactionsMock = func(s []model.TransactionRequest) map[string]model.TransactionResponse {
-		return make(map[string]model.TransactionResponse, 0)
+	processTransactionsMock = func(s []model.TransactionRequest) model.OrderedResponseMap {
+		return model.OrderedResponseMap{}
 	}
-	writeTransactionsMock = func(responses map[string]model.TransactionResponse, outputFile string) error {
+	writeTransactionsMock = func(responses model.OrderedResponseMap, outputFile string) error {
 		return nil
 	}
 	err := accountManager.Execute("testFile", "testOutputFile")
@@ -45,10 +45,10 @@ func TestExecute(t *testing.T) {
 	readTransactionFileMock = func(s string) ([]model.TransactionRequest, error) {
 		return []model.TransactionRequest{}, nil
 	}
-	processTransactionsMock = func(s []model.TransactionRequest) map[string]model.TransactionResponse {
-		return make(map[string]model.TransactionResponse, 0)
+	processTransactionsMock = func(s []model.TransactionRequest) model.OrderedResponseMap {
+		return model.OrderedResponseMap{}
 	}
-	writeTransactionsMock = func(responses map[string]model.TransactionResponse, outputFile string) error {
+	writeTransactionsMock = func(responses model.OrderedResponseMap, outputFile string) error {
 		return errors.New("Error writing file")
 	}
 	err = accountManager.Execute("testFile", "testOutputFile")
@@ -57,17 +57,17 @@ func TestExecute(t *testing.T) {
 
 //Mocks
 var readTransactionFileMock func(string) ([]model.TransactionRequest, error)
-var processTransactionsMock func([]model.TransactionRequest) map[string]model.TransactionResponse
-var writeTransactionsMock func(map[string]model.TransactionResponse, string) error
+var processTransactionsMock func([]model.TransactionRequest) model.OrderedResponseMap
+var writeTransactionsMock func(model.OrderedResponseMap, string) error
 
 type serviceMock struct{}
 
 func (sm serviceMock) ReadTransactionFile(inputFile string) ([]model.TransactionRequest, error) {
 	return readTransactionFileMock(inputFile)
 }
-func (sm serviceMock) ProcessTransactions(requests []model.TransactionRequest) map[string]model.TransactionResponse {
+func (sm serviceMock) ProcessTransactions(requests []model.TransactionRequest) model.OrderedResponseMap {
 	return processTransactionsMock(requests)
 }
-func (sm serviceMock) WriteTransactionOutput(responses map[string]model.TransactionResponse, outputFile string) error {
+func (sm serviceMock) WriteTransactionOutput(responses model.OrderedResponseMap, outputFile string) error {
 	return writeTransactionsMock(responses, outputFile)
 }
