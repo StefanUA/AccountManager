@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -14,7 +15,8 @@ const layout = "2006-01-02T15:04:05Z07:00"
 
 // MarshalJSON conversts JSONTime to bytes representing a JSON string
 func (jt JSONTime) MarshalJSON() ([]byte, error) {
-	return []byte(jt.Time.Format(layout)), nil
+	stamp := fmt.Sprintf("\"%s\"", time.Time(jt.Time).Format(layout))
+	return []byte(stamp), nil
 }
 
 // UnmarshalJSON conversts a JSON string to JSONTime stuct

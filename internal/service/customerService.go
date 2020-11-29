@@ -3,6 +3,7 @@ package service
 import (
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/StefanUA/AccountManager/internal/model"
@@ -15,6 +16,8 @@ type (
 	ICustomerService interface {
 		isValidTransactionRequest(model.Customer, model.TransactionRequest) bool
 		Load(model.TransactionRequest) bool
+		getAmount(cashAmount string) (float64, bool)
+		getWeekKey(time.Time) string
 	}
 
 	//CustomerService implements the contract for interacting
@@ -49,13 +52,15 @@ func (cs *CustomerService) getWeekKey(inputTime time.Time) string {
 	return strconv.Itoa(year) + "-" + strconv.Itoa(week)
 }
 
+//getAmount checks for valid dollar amounts and returns the value.
+//non-dollar currencies or badly formatted amounts return 0
 func (cs *CustomerService) getAmount(cashAmount string) (float64, bool) {
-	regx := regexp.MustCompile(`^\$([1-9]\d*\.\d\d?$)`)
+	regx := regexp.MustCompile(`^\$((([1-9]\d{0,2}(,\d{3})*)|(([1-9]\d*)?\d))(\.\d\d)?$)`)
 	match := regx.FindStringSubmatch(cashAmount)
-	if cap(match) == 1 {
+	if cap(match) <= 1 {
 		return 0, false
 	}
-	value, err := strconv.ParseFloat(match[1], 64)
+	value, err := strconv.ParseFloat(strings.ReplaceAll(match[1], ",", ""), 64)
 	if err != nil {
 		return 0, false
 	}

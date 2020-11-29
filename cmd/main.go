@@ -20,7 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	accountManager := accountmanager.NewCommand(service.TransactionService{})
+	accountManager := accountmanager.NewCommand(&service.TransactionService{})
 	err := accountManager.Execute(*inputFilePtr, *outputFilePtr)
 	if err != nil {
 		log.Fatalf("Error processing: %v", err)
