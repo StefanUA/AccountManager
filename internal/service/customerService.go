@@ -50,10 +50,13 @@ func (cs CustomerService) getWeekKey(inputTime time.Time) string {
 }
 
 func (cs CustomerService) getAmount(cashAmount string) (float64, bool) {
-	regx := regexp.MustCompile(`^\$(([1-9]\d*)?\d)(\.\d\d)?$`)
+	regx := regexp.MustCompile(`^\$([1-9]\d*\.\d\d?$)`)
 	match := regx.FindStringSubmatch(cashAmount)
+	if cap(match) == 1 {
+		return 0, false
+	}
 	value, err := strconv.ParseFloat(match[1], 64)
-	if cap(match) != 1 && err != nil {
+	if err != nil {
 		return 0, false
 	}
 	return value, true
@@ -62,12 +65,11 @@ func (cs CustomerService) getAmount(cashAmount string) (float64, bool) {
 //Load takes in a transaction and performs it against a customer account
 //returns a boolean to represent the successful execution of the transaction
 func (cs CustomerService) Load(transactionRequest model.TransactionRequest) bool {
-	customer, ok := customers[transactionRequest.CustomerID]
+	customer, custExists := customers[transactionRequest.CustomerID]
 	result := false
 
-	if !ok {
+	if !custExists {
 		customer = model.NewCustomer(transactionRequest.ID)
-		customers[customer.CustomerID] = customer
 	}
 
 	if cs.isValidTransactionRequest(customer, transactionRequest) {
@@ -82,10 +84,9 @@ func (cs CustomerService) Load(transactionRequest model.TransactionRequest) bool
 		dailyTransaction := &weeklyTransaction.Days[transactionRequest.Time.Time.Day()]
 		dailyTransaction.Count++
 		dailyTransaction.Total += amount
-		customer.WeeklyTransactions[weekKey] = model.NewWeeklyTransaction()
+		customer.WeeklyTransactions[weekKey] = weeklyTransaction
 		customers[transactionRequest.CustomerID] = customer
 		result = true
 	}
-
 	return result
 }

@@ -16,6 +16,12 @@ type (
 		CustomerID string `json:"customer_id"`
 		Accepted   bool   `json:"accepted"`
 	}
+
+	//OrderedResponseMap stores key-value pairs in the order in which they are entered
+	OrderedResponseMap struct {
+		keys   []string
+		values []TransactionResponse
+	}
 )
 
 //NewTransactionResponse initialiazes a new transaction response for a transaction with default accepted value

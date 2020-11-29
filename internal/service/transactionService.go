@@ -26,6 +26,7 @@ type (
 
 var customerService ICustomerService = CustomerService{}
 var osOpen = os.Open
+var osCreate = os.Create
 var bufioNewScanner = bufio.NewScanner
 
 //ReadTransactionFile receives an input file location
@@ -33,7 +34,7 @@ var bufioNewScanner = bufio.NewScanner
 func (ts TransactionService) ReadTransactionFile(inputFile string) ([]model.TransactionRequest, error) {
 	file, err := osOpen(inputFile)
 	if err != nil {
-		log.Fatalf("Error reading file: %v", err)
+		log.Fatalf("Error reading file '%s': %v", inputFile, err)
 		return nil, err
 	}
 	defer file.Close()
@@ -75,5 +76,30 @@ func (ts TransactionService) ProcessTransactions(transactionRequests []model.Tra
 //WriteTransactionOutput receives a list of transaction responses
 //and outputs the data into an output file
 func (ts TransactionService) WriteTransactionOutput(responses map[string]model.TransactionResponse, outputFile string) error {
-	return nil
+	file, err := osCreate(outputFile)
+	if err != nil {
+		log.Fatalf("Error writing file '%s': %v", outputFile, err)
+		return err
+	}
+	defer file.Close()
+	return ts.writeResponseFile(file, responses)
+}
+
+func (ts TransactionService) writeResponseFile(writer io.Writer, responses map[string]model.TransactionResponse) error {
+	w := bufio.NewWriter(writer)
+	var err error
+	for _, value := range responses {
+		jsonBytes, err := json.Marshal(value)
+		if err != nil {
+			log.Fatalf("Error marshalling input: %v", value)
+			jsonBytes = []byte("")
+		}
+		_, err = w.Write(jsonBytes)
+		err = w.WriteByte('\n')
+		if err != nil {
+			log.Fatalf("Error writing input: %v", value)
+		}
+	}
+	w.Flush()
+	return err
 }
