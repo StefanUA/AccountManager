@@ -15,8 +15,8 @@ type (
 	//transactions
 	ITransactionService interface {
 		ReadTransactionFile(string) ([]model.TransactionRequest, error)
-		ProcessTransactions([]model.TransactionRequest) map[string]model.TransactionResponse
-		WriteTransactionOutput(map[string]model.TransactionResponse, string) error
+		ProcessTransactions([]model.TransactionRequest) model.OrderedResponseMap
+		WriteTransactionOutput(model.OrderedResponseMap, string) error
 	}
 
 	//TransactionService implements the contract for handling
@@ -57,25 +57,24 @@ func (ts TransactionService) readTransactionFile(reader io.Reader) []model.Trans
 
 //ProcessTransactions receives a list of transactions
 //and executes transactions written in the file
-func (ts TransactionService) ProcessTransactions(transactionRequests []model.TransactionRequest) map[string]model.TransactionResponse {
-	transactionResponses := make(map[string]model.TransactionResponse)
+func (ts TransactionService) ProcessTransactions(transactionRequests []model.TransactionRequest) model.OrderedResponseMap {
+	transactionResponses := model.NewOrderedResponseMap()
 	for _, transactionRequest := range transactionRequests {
 		transactionResponse := model.NewTransactionResponse(transactionRequest.ID, transactionRequest.CustomerID)
-		if _, ok := transactionResponses[transactionResponse.ID]; !ok {
+		if existingTransaction := transactionResponses.Get(transactionResponse.ID); existingTransaction.ID == "" {
 			transactionResponse.Accepted = customerService.Load(transactionRequest)
 		} else {
 			transactionResponse.Accepted = false
 		}
-		transactionResponses[transactionResponse.ID] = transactionResponse
+		transactionResponses.Set(transactionResponse.ID, transactionResponse)
 	}
-	log.Printf("%v\n", transactionResponses)
 
 	return transactionResponses
 }
 
 //WriteTransactionOutput receives a list of transaction responses
 //and outputs the data into an output file
-func (ts TransactionService) WriteTransactionOutput(responses map[string]model.TransactionResponse, outputFile string) error {
+func (ts TransactionService) WriteTransactionOutput(responses model.OrderedResponseMap, outputFile string) error {
 	file, err := osCreate(outputFile)
 	if err != nil {
 		log.Fatalf("Error writing file '%s': %v", outputFile, err)
@@ -85,10 +84,11 @@ func (ts TransactionService) WriteTransactionOutput(responses map[string]model.T
 	return ts.writeResponseFile(file, responses)
 }
 
-func (ts TransactionService) writeResponseFile(writer io.Writer, responses map[string]model.TransactionResponse) error {
+func (ts TransactionService) writeResponseFile(writer io.Writer, responses model.OrderedResponseMap) error {
 	w := bufio.NewWriter(writer)
 	var err error
-	for _, value := range responses {
+	for i := 0; i < responses.Size(); i++ {
+		value := responses.GetByIndex(i)
 		jsonBytes, err := json.Marshal(value)
 		if err != nil {
 			log.Fatalf("Error marshalling input: %v", value)

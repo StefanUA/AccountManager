@@ -1,11 +1,10 @@
 package service
 
-
 //Mocks
-var readTransactionFileMock func(string) ([]*transaction.Transaction, error)
+// var readTransactionFileMock func(string) ([]*transaction.Transaction, error)
 
-type serviceMock struct{}
+// type serviceMock struct{}
 
-func (sm serviceMock) ReadTransactionFile(inputFile string) ([]*transaction.Transaction, error) {
-	return readTransactionFileMock(inputFile)
-}
+// func (sm serviceMock) ReadTransactionFile(inputFile string) ([]*transaction.Transaction, error) {
+// 	return readTransactionFileMock(inputFile)
+// }
