@@ -83,6 +83,7 @@ func (cs CustomerService) Load(transactionRequest model.TransactionRequest) bool
 		dailyTransaction.Count++
 		dailyTransaction.Total += amount
 		customer.WeeklyTransactions[weekKey] = model.NewWeeklyTransaction()
+		customers[transactionRequest.CustomerID] = customer
 		result = true
 	}
 
