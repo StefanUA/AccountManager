@@ -2,8 +2,11 @@ package service
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
+
+	"github.com/StefanUA/AccountManager/internal/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_getAmount(t *testing.T) {
@@ -40,5 +43,44 @@ func Test_getAmount(t *testing.T) {
 }
 
 func Test_Load(t *testing.T) {
+	assert := assert.New(t)
 
+	var cs ICustomerService = &CustomerService{}
+	customers = make(map[string]model.Customer)
+
+	tests := []struct {
+		errorMsg    string
+		transaction model.TransactionRequest
+		response    bool
+	}{
+		{
+			errorMsg: "Valid transaction should execute sucessfully",
+			transaction: model.TransactionRequest{
+				ID:         "testID",
+				CustomerID: "testCustID",
+				LoadAmount: "$1000.54",
+				Time: model.JSONTime{
+					Time: time.Now(),
+				},
+			},
+			response: true,
+		},
+		{
+			errorMsg: "Inalid transaction should execute fail",
+			transaction: model.TransactionRequest{
+				ID:         "testID-1",
+				CustomerID: "testCustID-1",
+				LoadAmount: "$s5",
+				Time: model.JSONTime{
+					Time: time.Now(),
+				},
+			},
+			response: false,
+		},
+	}
+
+	for _, test := range tests {
+		response := cs.Load(test.transaction)
+		assert.Equal(test.response, response, test.errorMsg)
+	}
 }

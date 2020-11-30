@@ -32,3 +32,39 @@ Your program should process lines from `input.txt` and return output in the form
 You're welcome to write your program in a general-purpose language of your choosing, but as we use Go on the back-end and TypeScript on the front-end, we do have a preference towards solutions written in Go (back-end) and TypeScript (front-end).
 
 We value well-structured, self-documenting code with sensible test coverage. Descriptive function and variable names are appreciated, as is isolating your business logic from the rest of your code.
+
+## Using AccountManager
+
+### Prerequisites
+
+#### Golang build environment
+
+AccountManager is tested in a Golang 1.15 build environment.
+
+### Build
+
+#### Full build
+
+You can build AccountManager locally using the `make` command:
+
+`make build`
+
+To do a cleaning before building, run `make clean`.
+
+### Running tests
+
+You can run tests using the `make` command:
+
+`make test`
+
+### Running AccountManager
+
+You can run the application using the `make` command:
+
+`make run`
+
+or
+
+You can run the AccountManager executable from the root directory after building
+
+`./AccountManager --input=input.txt --output=results.txt;`

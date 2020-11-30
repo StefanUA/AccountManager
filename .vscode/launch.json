@@ -11,7 +11,12 @@
       "mode": "debug",
       "program": "${workspaceRoot}/cmd/main.go",
       "env": {},
-      "args": ["--input", "${workspaceRoot}/input2.txt"]
+      "args": [
+        "--input",
+        "${workspaceRoot}/input2.txt",
+        "--output",
+        "${workspaceRoot}/output2.txt"
+      ]
     },
     {
       "name": "LaunchWindows",

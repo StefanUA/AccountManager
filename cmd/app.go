@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"flag"
@@ -9,7 +9,8 @@ import (
 	accountmanager "github.com/StefanUA/AccountManager/pkg/accountManager"
 )
 
-func main() {
+//Execute runs the AccountManager application
+func Execute() {
 	inputFilePtr := flag.String("input", "", "Input file to process (Required)")
 	outputFilePtr := flag.String("output", "", "Output file to write results (Required)")
 	flag.Parse()
