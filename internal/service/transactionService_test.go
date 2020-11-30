@@ -102,17 +102,14 @@ func Test_writeResponseFile(t *testing.T) {
 	}
 	validResponse.Set("testID-testCustID", responseItem)
 	assert.Equal(validResponse.Size(), 1)
-	var validWriter *bytes.Buffer
+	var validWriter bytes.Buffer
 
 	jsonBytes, err := json.Marshal(validResponse.GetByIndex(0))
 	assert.NoError(err, "Valid response should serialize without error")
 
-	err = ts.writeResponseFile(validWriter, validResponse)
+	err = ts.writeResponseFile(&validWriter, validResponse)
 	assert.NoError(err, "Valid response should write without error")
-	assert.Equal(string(jsonBytes), validWriter.String(), "Valid writer should print transaction response")
-
-	//result = ts.readTransactionFile(invalidReader)
-	//assert.Nil(result, "Invalid reader should return nil response")
+	assert.Equal(string(jsonBytes)+"\n", validWriter.String(), "Valid writer should print transaction response")
 }
 
 //Mocks
